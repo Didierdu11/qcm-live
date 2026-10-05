@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="description" content="QCM Live : créez et animez des quiz en direct." />
+  <title>QCM Live</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home">QCM Live</a>
+    <span class="connection" id="connectionState">Connexion…</span>
+  </header>
+
+  <main id="app" class="container"></main>
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <template id="homeTemplate">
+    <section class="hero">
+      <span class="eyebrow">QCM en direct</span>
+      <h1>Créez un quiz et suivez les réponses en temps réel.</h1>
+      <p>Le présentateur crée une salle. Les participants rejoignent avec un QR code ou un code à six caractères, choisissent un pseudo et répondent depuis leur téléphone.</p>
+      <div class="actions">
+        <a class="button primary" href="#create">Créer un QCM</a>
+        <button class="button secondary" id="showJoinButton">Rejoindre un QCM</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="joinPanel">
+      <h2>Rejoindre une salle</h2>
+      <label>Code de la salle
+        <input id="roomCodeInput" maxlength="6" autocapitalize="characters" placeholder="Ex. AB7K2P" />
+      </label>
+      <button class="button primary wide" id="joinByCodeButton">Continuer</button>
+    </section>
+  </template>
+
+  <template id="createTemplate">
+    <section class="heading">
+      <span class="eyebrow">Présentateur</span>
+      <h1>Créer un QCM</h1>
+      <p>Chaque question comprend quatre réponses et une seule réponse correcte.</p>
+    </section>
+    <section class="card">
+      <label>Titre du QCM
+        <input id="quizTitle" maxlength="80" placeholder="Ex. Sécurité électrique" />
+      </label>
+    </section>
+    <div id="questionsEditor"></div>
+    <button class="button secondary wide" id="addQuestionButton">+ Ajouter une question</button>
+    <button class="button primary wide" id="createRoomButton">Créer la salle</button>
+  </template>
+
+  <template id="hostTemplate">
+    <section class="host-grid">
+      <div>
+        <span class="eyebrow">Mode présentateur</span>
+        <h1 id="hostQuizTitle"></h1>
+        <p>Code de la salle : <strong class="room-code" id="hostRoomCode"></strong></p>
+        <div id="qrCode" class="qr"></div>
+        <button class="button secondary" id="copyJoinLinkButton">Copier le lien de participation</button>
+      </div>
+      <section class="card">
+        <h2>Participants</h2>
+        <div class="number" id="playersCount">0</div>
+        <div class="player-list" id="playersList"></div>
+      </section>
+    </section>
+    <section class="card" id="hostControls"></section>
+    <section class="card hidden" id="hostLiveStats">
+      <h2>Réponses en direct</h2>
+      <div class="stats">
+        <div><span>Réponses reçues</span><strong id="answerCount">0 / 0</strong></div>
+        <div><span>Bonnes réponses</span><strong id="correctCount">0</strong></div>
+      </div>
+      <div id="answerDistribution" class="distribution"></div>
+    </section>
+  </template>
+
+  <template id="joinTemplate">
+    <section class="join-page">
+      <span class="eyebrow">Participation</span>
+      <h1 id="joinQuizTitle">Connexion</h1>
+      <section id="nameCard" class="card">
+        <label>Ton prénom ou pseudo
+          <input id="playerNameInput" maxlength="24" placeholder="Ex. Julien" />
+        </label>
+        <button class="button primary wide" id="enterRoomButton">Rejoindre le QCM</button>
+      </section>
+      <section id="waitingCard" class="card hidden"><h2>Vous êtes connecté</h2><p>Attente du démarrage par le présentateur…</p></section>
+      <section id="questionCard" class="card hidden"></section>
+      <section id="correctionCard" class="card hidden"></section>
+      <section id="finishedCard" class="card hidden"></section>
+    </section>
+  </template>
+
+  <template id="resultsTemplate">
+    <section class="heading"><span class="eyebrow">QCM terminé</span><h1 id="resultsTitle">Résultats</h1></section>
+    <section class="card"><h2>Classement</h2><div id="leaderboard"></div></section>
+    <section class="card"><h2>Statistiques par question</h2><div id="questionStats"></div></section>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

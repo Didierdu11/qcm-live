@@ -1,340 +1,234 @@
-# Guide complet — QCM Live
+# Mode d’emploi complet — QCM Live 100 % gratuit
 
-Ce guide explique, pas à pas, comment installer et publier l’application **QCM Live**. À la fin, vous aurez une adresse web que le présentateur ouvre sur un PC et que les participants rejoignent avec un QR code.
+## 1. Ce que cette édition permet
 
-> **Objectif final** : `https://VOTRE-COMPTE.github.io/qcm-live/`
+Cette édition est conçue pour rester gratuite :
 
----
+- Code et site : GitHub + GitHub Pages.
+- Connexion technique des utilisateurs : Firebase Authentication anonyme.
+- Données live : Firebase Realtime Database, plan Spark gratuit.
+- PDF : généré dans le navigateur du présentateur.
+- Aucun Cloud Function, aucun serveur à payer, aucune carte bancaire nécessaire pour cette architecture de départ.
 
-## 1. Prérequis
+Fonctions incluses :
 
-Vous avez besoin de :
+- Plusieurs QCM enregistrés.
+- Création, modification et import de QCM JSON.
+- QR code de participation.
+- Avancement autonome des participants.
+- Questions à plusieurs bonnes réponses.
+- 1 point pour une réponse complète ; demi-point configurable.
+- Aucun affichage de correction pendant le QCM.
+- Résultat final global uniquement chez le participant.
+- Tableau présentateur par participant et par question.
+- PDF présentateur comprenant fiches individuelles, réponses encadrées, bonnes réponses en gras et synthèse/statistiques.
 
-- Un compte Google, pour Firebase.
-- Un compte GitHub, pour stocker le code et publier le site.
-- Un ordinateur avec un navigateur récent.
-- Idéalement Git installé, mais la méthode web GitHub fonctionne aussi.
-- Pour le déploiement Firebase Hosting, Node.js LTS est nécessaire. Il n’est pas nécessaire si vous utilisez seulement GitHub Pages.
+## 2. Limite à connaître absolument
 
-L’application fonctionne ensuite sur PC, Android et iPhone via navigateur.
+Pour rester totalement gratuit sans backend, le navigateur doit posséder les bonnes réponses afin de calculer les scores. Elles ne sont jamais affichées dans l’interface participant, mais un utilisateur très technique peut les retrouver dans les données du navigateur/Firebase.
 
----
+Cette application est donc adaptée à :
 
-## 2. Créer un compte GitHub
+- formation ;
+- entraînement ;
+- autoévaluation ;
+- réunion ;
+- animation ;
+- QCM interne sans enjeu officiel.
 
-1. Ouvrez <https://github.com/signup>.
-2. Créez votre compte avec une adresse e-mail et un mot de passe robuste.
-3. Confirmez l’e-mail demandé par GitHub.
-4. Connectez-vous à GitHub.
-5. En haut à droite, cliquez sur votre photo > **Settings**.
-6. Activez la double authentification dans **Password and authentication** si possible.
+Elle n’est pas adaptée à :
 
-### Créer le dépôt
+- examen certifiant ;
+- concours ;
+- vote officiel ;
+- évaluation RH sensible.
 
-1. Cliquez sur le `+` en haut à droite > **New repository**.
-2. Repository name : `qcm-live`.
-3. Choisissez **Public** si vous utilisez GitHub Pages gratuit classique et acceptez que le code soit visible. Choisissez **Private** seulement si votre offre GitHub et votre configuration Pages le permettent.
-4. Cochez **Add a README file** seulement si vous ne téléversez pas déjà celui du projet.
-5. Cliquez sur **Create repository**.
+## 3. Créer le compte GitHub
 
----
+1. Ouvrez https://github.com/signup.
+2. Créez votre compte, confirmez votre e-mail et connectez-vous.
+3. En haut à droite, cliquez sur `+` > **New repository**.
+4. Nom du dépôt : `qcm-live`.
+5. Choisissez **Public**.
+6. Cliquez sur **Create repository**.
 
-## 3. Envoyer les fichiers sur GitHub
+## 4. Mettre les fichiers sur GitHub
 
-### Méthode simple, sans terminal
+1. Décompressez l’archive livrée.
+2. Dans le dépôt GitHub créé, cliquez sur **Add file** > **Upload files**.
+3. Sélectionnez tous les fichiers du dossier `qcm-live-gratuit`.
+4. Les fichiers `index.html`, `style.css` et `app.js` doivent être à la racine du dépôt, pas dans un sous-dossier supplémentaire.
+5. Cliquez sur **Commit changes**.
 
-1. Décompressez l’archive `qcm-live.zip`.
-2. Ouvrez votre dépôt GitHub `qcm-live`.
-3. Cliquez sur **Add file** > **Upload files**.
-4. Glissez-déposez tous les fichiers du projet : `index.html`, `app.js`, `style.css`, `database.rules.json`, etc.
-5. Ne glissez pas le dossier parent lui-même : les fichiers doivent être à la racine du dépôt.
-6. Cliquez sur **Commit changes**.
+## 5. Créer le projet Firebase
 
-Vous devez voir au minimum :
-
-```text
-app.js
-index.html
-style.css
-database.rules.json
-manifest.webmanifest
-sw.js
-firebase.json
-```
-
-### Méthode terminal avec Git
-
-Dans le dossier décompressé :
-
-```bash
-git init
-git add .
-git commit -m "Première version de QCM Live"
-git branch -M main
-git remote add origin https://github.com/VOTRE-COMPTE/qcm-live.git
-git push -u origin main
-```
-
-Remplacez `VOTRE-COMPTE` par votre identifiant GitHub.
-
----
-
-## 4. Créer un projet Firebase
-
-1. Ouvrez <https://console.firebase.google.com/>.
+1. Ouvrez https://console.firebase.google.com/.
 2. Connectez-vous avec votre compte Google.
 3. Cliquez sur **Ajouter un projet**.
-4. Nom du projet : par exemple `QCM Live` ou `qcm-live-votre-prenom`.
-5. Cliquez sur **Continuer**.
-6. Google Analytics : vous pouvez le désactiver pour commencer.
-7. Cliquez sur **Créer le projet**.
-8. Attendez la fin, puis cliquez sur **Continuer**.
+4. Nom : par exemple `QCM Live`.
+5. Google Analytics : vous pouvez le désactiver au début.
+6. Cliquez sur **Créer le projet** puis **Continuer**.
 
-### Ajouter l’application Web Firebase
+## 6. Ajouter l’application Web
 
-1. Dans l’accueil de votre projet Firebase, cliquez sur l’icône `</>` pour **Ajouter une application Web**.
-2. Nom de l’application : `QCM Live Web`.
-3. Ne cochez pas Firebase Hosting ici si vous choisissez GitHub Pages.
-4. Cliquez sur **Enregistrer l’application**.
-5. Firebase affiche un bloc `firebaseConfig` similaire à celui-ci :
+1. Firebase Console > roue dentée > **Paramètres du projet**.
+2. Descendez jusqu’à **Vos applications**.
+3. Cliquez sur l’icône `</>` pour ajouter une application Web.
+4. Nom : `QCM Live Web`.
+5. Cliquez sur **Enregistrer l’application**.
+6. Firebase affiche un objet `firebaseConfig`.
+7. Ouvrez `app.js` dans GitHub, cliquez sur le crayon d’édition.
+8. Remplacez entièrement l’objet présent au début de `app.js` par celui de Firebase.
+9. Cliquez sur **Commit changes**.
 
-```javascript
-const firebaseConfig = {
-  apiKey: "AIza...",
-  authDomain: "qcm-live-xxxxx.firebaseapp.com",
-  projectId: "qcm-live-xxxxx",
-  storageBucket: "qcm-live-xxxxx.firebasestorage.app",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
-};
-```
+### Ajouter `databaseURL`
 
-6. Copiez ce bloc : vous en aurez besoin à l’étape 7.
-
----
-
-## 5. Activer l’authentification anonyme
-
-L’authentification anonyme donne un identifiant Firebase technique à chaque navigateur. Les joueurs ne créent pas de compte.
-
-1. Dans Firebase Console, menu gauche : **Build** > **Authentication**.
-2. Cliquez sur **Get started** / **Commencer** si nécessaire.
-3. Ouvrez l’onglet **Sign-in method**.
-4. Cliquez sur **Anonymous** / **Anonyme**.
-5. Activez le fournisseur.
-6. Cliquez sur **Save** / **Enregistrer**.
-
-Sans cette étape, l’application affichera une erreur de connexion Firebase.
-
----
-
-## 6. Créer Realtime Database
-
-1. Firebase Console > **Build** > **Realtime Database**.
-2. Cliquez sur **Create Database** / **Créer une base de données**.
-3. Choisissez une région proche de vos utilisateurs. Pour la France, choisissez une région Europe si Firebase la propose dans votre écran.
-4. Pour démarrer, choisissez le mode de règles proposé, puis terminez la création.
-5. Ouvrez l’onglet **Rules** / **Règles**.
-6. Effacez le contenu existant.
-7. Ouvrez le fichier local `database.rules.json`.
-8. Copiez seulement le contenu JSON du fichier, collez-le dans l’éditeur Firebase.
-9. Cliquez sur **Publish** / **Publier**.
-
-### Important : ne laissez pas les règles ouvertes
-
-N’utilisez jamais durablement cette règle :
-
-```json
-{ "rules": { ".read": true, ".write": true } }
-```
-
-Elle laisserait n’importe qui lire, modifier ou supprimer les QCM. Les règles incluses dans le projet exigent une authentification Firebase et empêchent un participant d’écraser la réponse qu’il a déjà envoyée.
-
----
-
-## 7. Relier le code à Firebase
-
-1. Dans GitHub, ouvrez le fichier `app.js`.
-2. Cliquez sur l’icône crayon **Edit this file**.
-3. En haut du fichier, repérez :
-
-```javascript
-const firebaseConfig = {
-  apiKey: "REMPLACE_PAR_TON_API_KEY",
-  authDomain: "REMPLACE_PAR_TON_PROJET.firebaseapp.com",
-  databaseURL: "REMPLACE_PAR_TON_URL_REALTIME_DATABASE",
-  projectId: "REMPLACE_PAR_TON_PROJECT_ID",
-  storageBucket: "REMPLACE_PAR_TON_PROJET.firebasestorage.app",
-  messagingSenderId: "REMPLACE_PAR_TON_MESSAGING_SENDER_ID",
-  appId: "REMPLACE_PAR_TON_APP_ID"
-};
-```
-
-4. Remplacez **tout l’objet** par celui affiché dans Firebase Console.
-5. Vérifiez particulièrement `databaseURL`. Elle n’est parfois pas affichée dans la configuration Web initiale : vous la trouverez dans Firebase Console > Realtime Database, dans l’URL de la base. Elle ressemble à :
+Après avoir créé Realtime Database, récupérez son URL. Elle ressemble à :
 
 ```text
 https://VOTRE-PROJET-default-rtdb.europe-west1.firebasedatabase.app
 ```
 
-6. Ajoutez-la dans l’objet si nécessaire :
+Si `databaseURL` n’est pas présente dans la configuration Firebase copiée, ajoutez-la dans l’objet :
 
 ```javascript
 databaseURL: "https://VOTRE-PROJET-default-rtdb.europe-west1.firebasedatabase.app",
 ```
 
-7. Cliquez sur **Commit changes**.
+## 7. Activer l’authentification anonyme
 
-### À propos de `apiKey`
+1. Firebase Console > menu **Build** > **Authentication**.
+2. Cliquez sur **Commencer** si nécessaire.
+3. Ouvrez l’onglet **Sign-in method** / **Méthodes de connexion**.
+4. Cliquez sur **Anonymous / Anonyme**.
+5. Activez le fournisseur.
+6. Enregistrez.
 
-La configuration Firebase Web est normalement visible dans une application web : ce n’est pas un mot de passe secret. La protection repose sur Firebase Authentication et surtout sur les règles de la Realtime Database. Ne mettez en revanche jamais dans GitHub un mot de passe personnel, une clé de compte de service, un fichier `.env` sensible ou une clé privée.
+## 8. Créer Realtime Database
 
----
+1. Firebase Console > **Build** > **Realtime Database**.
+2. Cliquez sur **Créer une base de données**.
+3. Choisissez une région Europe si possible.
+4. Terminez la création.
+5. Ouvrez l’onglet **Rules / Règles**.
+6. Ouvrez le fichier local `database.rules.json`.
+7. Copiez le contenu complet et collez-le dans Firebase.
+8. Cliquez sur **Publier**.
 
-## 8. Publier avec GitHub Pages
+Ne laissez pas les règles temporaires de test ouvertes.
 
-1. Ouvrez votre dépôt GitHub.
+## 9. Activer GitHub Pages
+
+1. Dans GitHub, ouvrez votre dépôt `qcm-live`.
 2. Cliquez sur **Settings**.
-3. Dans le menu gauche, cliquez sur **Pages**.
-4. Dans **Build and deployment** :
-   - Source : **Deploy from a branch**.
-   - Branch : `main`.
-   - Folder : `/(root)`.
-5. Cliquez sur **Save**.
-6. Attendez une à trois minutes.
-7. Rechargez la page **Pages** : GitHub affichera l’adresse de votre site, en général :
+3. Cliquez sur **Pages** dans le menu gauche.
+4. Source : **Deploy from a branch**.
+5. Branche : `main`.
+6. Dossier : `/(root)`.
+7. Cliquez sur **Save**.
+8. Après une ou deux minutes, GitHub affiche une URL semblable à :
 
 ```text
 https://VOTRE-COMPTE.github.io/qcm-live/
 ```
 
-8. Ouvrez cette adresse dans un nouvel onglet.
+Ouvrez-la. Le bandeau doit afficher **Connecté** après quelques secondes.
 
-### Vérification immédiate
+## 10. Tester
 
-Si le haut de l’application affiche **Connecté**, Firebase est bien configuré.
+### Présentateur
 
-Si l’écran affiche une erreur ou reste sur « Connexion… » :
+1. Sur PC, ouvrez l’adresse GitHub Pages.
+2. Cliquez sur **Mes QCM**.
+3. Cliquez sur **Nouveau QCM**.
+4. Ajoutez un titre, les questions, 4 réponses et cochez les bonnes réponses.
+5. Cliquez sur **Enregistrer le QCM**.
+6. Dans la bibliothèque, cliquez sur **Lancer**.
+7. Affichez le QR code aux participants.
 
-- vérifiez `firebaseConfig` dans `app.js` ;
-- vérifiez que Anonymous est activé ;
-- vérifiez que `databaseURL` est exacte ;
-- ouvrez la console développeur du navigateur avec `F12` > Console pour lire l’erreur.
+### Participant
 
----
-
-## 9. Tester l’application
-
-### Test présentateur
-
-1. Ouvrez l’adresse GitHub Pages sur votre PC.
-2. Cliquez sur **Créer un QCM**.
-3. Entrez un titre.
-4. Écrivez au moins une question, quatre propositions et choisissez la bonne réponse avec le rond à gauche.
-5. Cliquez sur **Créer la salle**.
-6. Un code et un QR code apparaissent.
-
-### Test participant
-
-1. Sur un autre téléphone ou une fenêtre de navigation privée, scannez le QR code.
+1. Avec un autre téléphone ou une fenêtre de navigation privée, scannez le QR code.
 2. Saisissez un pseudo.
-3. Cliquez sur **Rejoindre le QCM**.
-4. Sur l’écran présentateur, vérifiez que le pseudo apparaît.
-5. Cliquez sur **Démarrer le QCM**.
-6. Répondez depuis le téléphone.
-7. Le présentateur voit le nombre de réponses et la répartition A/B/C/D.
-8. Cliquez sur **Fermer les réponses et afficher la correction**.
-9. Passez à la question suivante ou affichez les résultats finaux.
+3. Répondez à chaque question.
+4. Vous ne voyez ni correction ni score intermédiaire.
+5. À la dernière question, le score global apparaît.
 
-> Une fenêtre normale et une fenêtre privée sont nécessaires si vous testez depuis le même PC, car Firebase identifie le même navigateur avec le même compte anonyme local.
+### Présentateur — rapport
 
----
+1. Regardez le tableau : chaque colonne Q1, Q2, etc. affiche `1`, `0,5`, `0` ou `—`.
+2. Cliquez sur **Télécharger le rapport PDF**.
+3. Le PDF contient une fiche détaillée par participant.
+4. Les réponses sélectionnées sont encadrées ; les bonnes réponses sont en gras.
+5. Les dernières pages contiennent la synthèse et les statistiques par question.
 
-## 10. Mettre à jour l’application
+## 11. Créer une question à demi-point
 
-### Depuis GitHub Web
+Pour une question avec 3 bonnes réponses parmi 4 :
 
-1. Ouvrez le fichier à modifier, par exemple `style.css`.
-2. Cliquez sur le crayon.
-3. Modifiez et faites **Commit changes**.
-4. GitHub Pages redéploie le site automatiquement après un court délai.
+1. Cochez les trois bonnes réponses dans l’éditeur.
+2. Cochez **Autoriser une note partielle**.
+3. Mettez `2` dans « Bonnes réponses nécessaires ».
+4. Mettez `0,5` dans « Points partiels ».
 
-### Depuis votre PC avec Git
+Exemple : A, C et D correctes ; B fausse.
 
-```bash
-git add .
-git commit -m "Amélioration de l'interface"
-git push
-```
+| Réponses cochées | Note |
+|---|---:|
+| A + C + D | 1 |
+| A + C | 0,5 |
+| A + D | 0,5 |
+| C + D | 0,5 |
+| A + B | 0 |
+| A + C + B | 0 |
+| Toutes les réponses | 0 |
 
----
+Une mauvaise réponse cochée annule la note partielle.
 
-## 11. Option : déployer avec Firebase Hosting
+## 12. Importer les QCM fournis
 
-Cette option n’est pas obligatoire. GitHub Pages suffit. Firebase Hosting peut toutefois être pratique si vous préférez une URL en `web.app`.
-
-1. Installez Node.js LTS depuis <https://nodejs.org/>.
-2. Ouvrez un terminal dans le dossier du projet.
-3. Lancez :
-
-```bash
-npm install -g firebase-tools
-firebase login
-firebase use --add
-```
-
-4. Sélectionnez votre projet Firebase.
-5. Déployez :
-
-```bash
-firebase deploy --only hosting,database
-```
-
-Le fichier `firebase.json` inclus est déjà configuré pour publier les fichiers du dossier actuel. Si vous utilisez Firebase Hosting, vous pouvez laisser GitHub uniquement pour le code.
-
----
-
-## 12. Limites de sécurité de cette version
-
-Cette version est faite pour des jeux, réunions, formations et démonstrations. Elle ne doit pas être utilisée telle quelle pour un examen certifiant, un vote officiel ou un concours avec enjeu.
-
-Pourquoi : la bonne réponse (`correctIndex`) est envoyée au navigateur pour que la correction et les scores fonctionnent sans serveur. Un participant technique peut inspecter les données du navigateur.
-
-Pour une version anti-triche, il faut :
-
-1. Stocker les réponses correctes dans un chemin Firebase privé, non lisible par les participants.
-2. Utiliser Firebase Cloud Functions ou un serveur pour accepter une réponse, vérifier la réponse et calculer le score côté serveur.
-3. Authentifier les présentateurs avec Google ou e-mail/mot de passe.
-4. Ajouter une validation des états de jeu dans les règles Firebase.
-
----
-
-## 13. Dépannage rapide
-
-| Symptôme | Cause probable | Correction |
-|---|---|---|
-| `auth/operation-not-allowed` | Authentification anonyme désactivée | Activez Anonymous dans Authentication > Sign-in method |
-| `permission_denied` | Règles Realtime Database non publiées ou incorrectes | Publiez `database.rules.json` dans l’onglet Rules |
-| QR code ouvre une page vide | Site GitHub Pages non encore publié ou mauvaise URL | Attendez le déploiement et utilisez l’adresse Pages indiquée par GitHub |
-| Les réponses n’apparaissent pas | Mauvais `databaseURL` ou règles bloquantes | Vérifiez `app.js` et l’onglet Rules |
-| La page affiche toujours l’ancienne version | Cache navigateur ou service worker | Rechargez avec Ctrl+F5 ou videz les données du site |
-| Deux tests ont le même participant | Même navigateur et même session Firebase anonyme | Utilisez navigation privée ou un autre appareil |
-
----
-
-## 14. Structure du projet
+Deux fichiers sont inclus :
 
 ```text
-qcm-live/
-├── index.html                Interface web
-├── style.css                 Mise en forme responsive
-├── app.js                    Logique QCM + Firebase
-├── database.rules.json       Règles Realtime Database
-├── firebase.json             Configuration Firebase Hosting
-├── manifest.webmanifest      Installation PWA
-├── sw.js                     Service worker minimal
-├── .gitignore                Fichiers à ignorer par Git
-├── .nojekyll                 Compatibilité GitHub Pages
-├── README.md                 Résumé du projet
-└── GUIDE_INSTALLATION.md     Ce guide
+qcm-mathematiques.json
+qcm-qualite-agroalimentaire.json
 ```
+
+Pour les charger :
+
+1. Ouvrez **Mes QCM**.
+2. Cliquez sur **Importer un QCM JSON**.
+3. Sélectionnez l’un des deux fichiers.
+4. Le QCM apparaît dans la liste.
+5. Cliquez sur **Modifier** si vous voulez l’adapter.
+6. Cliquez sur **Lancer** pour créer une salle.
+
+## 13. Limites gratuites à surveiller
+
+- Firebase Spark Realtime Database : environ 100 connexions simultanées pour ce type d’usage gratuit.
+- Un onglet navigateur ouvert compte généralement comme une connexion.
+- Pour rester confortable, limitez les séances à environ 70 à 80 participants connectés simultanément.
+- Nettoyez occasionnellement les anciennes salles dans Firebase Realtime Database si vous effectuez beaucoup de tests.
+
+## 14. Dépannage
+
+| Problème | Cause probable | Solution |
+|---|---|---|
+| `auth/operation-not-allowed` | Auth anonyme inactive | Activez Anonymous dans Authentication |
+| `permission_denied` | Règles non publiées | Collez et publiez `database.rules.json` |
+| Le bandeau reste sur Connexion | Mauvaise config Firebase | Vérifiez `firebaseConfig` et `databaseURL` |
+| QR code mène à une page absente | GitHub Pages non publié | Vérifiez Settings > Pages et attendez le déploiement |
+| Ancienne interface affichée | Cache navigateur | Rechargez avec Ctrl+F5 ou videz les données du site |
+| Deux tests partagent le même participant | Même navigateur | Utilisez un autre appareil ou une fenêtre privée |
+
+## 15. Évolutions possibles sans changer l’usage
+
+- Ajout d’un logo sur le PDF.
+- Ajout de nom, prénom et groupe participant.
+- Export CSV.
+- Minuteur par question.
+- Suppression des QCM et des salles depuis l’interface.
+- Duplication d’un QCM.
+- Classement final optionnel.
+
+Pour une correction réellement cachée et un usage anti-triche, il faudra à l’avenir ajouter un backend sécurisé, ce qui sort de la solution strictement gratuite.

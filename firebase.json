@@ -1,16 +1,1 @@
-{
-  "hosting": {
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      "database.rules.json",
-      ".git/**",
-      ".github/**",
-      "README.md",
-      "**/node_modules/**"
-    ]
-  },
-  "database": {
-    "rules": "database.rules.json"
-  }
-}
+{"hosting":{"public":".","ignore":["firebase.json","database.rules.json","README.md","GUIDE_INSTALLATION.md",".git/**","**/node_modules/**"]},"database":{"rules":"database.rules.json"}}

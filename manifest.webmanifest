@@ -1,10 +1,1 @@
-{
-  "name": "QCM Live",
-  "short_name": "QCM Live",
-  "description": "Création et animation de QCM en direct",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f1f5f9",
-  "theme_color": "#2563eb",
-  "lang": "fr"
-}
+{"name":"QCM Live","short_name":"QCM Live","start_url":"./","display":"standalone","background_color":"#f1f5f9","theme_color":"#2563eb","lang":"fr"}

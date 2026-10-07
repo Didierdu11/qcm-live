@@ -1,234 +1,165 @@
-# Mode d’emploi complet — QCM Live 100 % gratuit
+# Installation détaillée — QCM Live gratuit V2
 
-## 1. Ce que cette édition permet
+## Fonctionnalités ajoutées
 
-Cette édition est conçue pour rester gratuite :
+Cette version ajoute :
 
-- Code et site : GitHub + GitHub Pages.
-- Connexion technique des utilisateurs : Firebase Authentication anonyme.
-- Données live : Firebase Realtime Database, plan Spark gratuit.
-- PDF : généré dans le navigateur du présentateur.
-- Aucun Cloud Function, aucun serveur à payer, aucune carte bancaire nécessaire pour cette architecture de départ.
+- **Priorité 1 — fiabilité** : sauvegarde dans Firebase, import/export JSON, PDF vierge hors ligne, indication de connexion et conservation des QCM.
+- **Priorité 2 — bibliothèque** : plusieurs QCM, modification, import JSON, import Excel à connecter selon la bibliothèque SheetJS utilisée.
+- **Barre de progression** : affichée chez le participant avec `Question x / y`.
+- **Alerte de temps** : si une durée est configurée, la minuterie passe en orange à 5 secondes et vibre brièvement si le navigateur autorise la vibration.
+- **Priorité 5 — suivi** : tableau coloré, filtres Tous / En cours / Terminés, score et progression.
+- **Priorité 6 — PDF** : rapport formateur détaillé et PDF vierge pour une session papier hors ligne.
 
-Fonctions incluses :
+## Installation GitHub/Firebase
 
-- Plusieurs QCM enregistrés.
-- Création, modification et import de QCM JSON.
-- QR code de participation.
-- Avancement autonome des participants.
-- Questions à plusieurs bonnes réponses.
-- 1 point pour une réponse complète ; demi-point configurable.
-- Aucun affichage de correction pendant le QCM.
-- Résultat final global uniquement chez le participant.
-- Tableau présentateur par participant et par question.
-- PDF présentateur comprenant fiches individuelles, réponses encadrées, bonnes réponses en gras et synthèse/statistiques.
+1. Créez un dépôt GitHub public nommé `qcm-live`.
+2. Téléversez tous les fichiers à la racine : `index.html`, `app.js`, `style.css`, etc.
+3. Dans Firebase Console, créez ou utilisez votre projet.
+4. Ajoutez une application Web et copiez sa configuration.
+5. Dans `app.js`, remplacez l’objet `firebaseConfig` par vos valeurs et ajoutez `databaseURL` si nécessaire.
+6. Firebase > Build > Authentication > Sign-in method > Anonymous > Activer.
+7. Firebase > Build > Realtime Database > créer la base.
+8. Ouvrez Rules et publiez le contenu de `database.rules.json`.
+9. GitHub > Settings > Pages > Deploy from a branch > `main` > `/(root)`.
 
-## 2. Limite à connaître absolument
-
-Pour rester totalement gratuit sans backend, le navigateur doit posséder les bonnes réponses afin de calculer les scores. Elles ne sont jamais affichées dans l’interface participant, mais un utilisateur très technique peut les retrouver dans les données du navigateur/Firebase.
-
-Cette application est donc adaptée à :
-
-- formation ;
-- entraînement ;
-- autoévaluation ;
-- réunion ;
-- animation ;
-- QCM interne sans enjeu officiel.
-
-Elle n’est pas adaptée à :
-
-- examen certifiant ;
-- concours ;
-- vote officiel ;
-- évaluation RH sensible.
-
-## 3. Créer le compte GitHub
-
-1. Ouvrez https://github.com/signup.
-2. Créez votre compte, confirmez votre e-mail et connectez-vous.
-3. En haut à droite, cliquez sur `+` > **New repository**.
-4. Nom du dépôt : `qcm-live`.
-5. Choisissez **Public**.
-6. Cliquez sur **Create repository**.
-
-## 4. Mettre les fichiers sur GitHub
-
-1. Décompressez l’archive livrée.
-2. Dans le dépôt GitHub créé, cliquez sur **Add file** > **Upload files**.
-3. Sélectionnez tous les fichiers du dossier `qcm-live-gratuit`.
-4. Les fichiers `index.html`, `style.css` et `app.js` doivent être à la racine du dépôt, pas dans un sous-dossier supplémentaire.
-5. Cliquez sur **Commit changes**.
-
-## 5. Créer le projet Firebase
-
-1. Ouvrez https://console.firebase.google.com/.
-2. Connectez-vous avec votre compte Google.
-3. Cliquez sur **Ajouter un projet**.
-4. Nom : par exemple `QCM Live`.
-5. Google Analytics : vous pouvez le désactiver au début.
-6. Cliquez sur **Créer le projet** puis **Continuer**.
-
-## 6. Ajouter l’application Web
-
-1. Firebase Console > roue dentée > **Paramètres du projet**.
-2. Descendez jusqu’à **Vos applications**.
-3. Cliquez sur l’icône `</>` pour ajouter une application Web.
-4. Nom : `QCM Live Web`.
-5. Cliquez sur **Enregistrer l’application**.
-6. Firebase affiche un objet `firebaseConfig`.
-7. Ouvrez `app.js` dans GitHub, cliquez sur le crayon d’édition.
-8. Remplacez entièrement l’objet présent au début de `app.js` par celui de Firebase.
-9. Cliquez sur **Commit changes**.
-
-### Ajouter `databaseURL`
-
-Après avoir créé Realtime Database, récupérez son URL. Elle ressemble à :
-
-```text
-https://VOTRE-PROJET-default-rtdb.europe-west1.firebasedatabase.app
-```
-
-Si `databaseURL` n’est pas présente dans la configuration Firebase copiée, ajoutez-la dans l’objet :
+## Structure de firebaseConfig
 
 ```javascript
-databaseURL: "https://VOTRE-PROJET-default-rtdb.europe-west1.firebasedatabase.app",
+const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "votre-projet.firebaseapp.com",
+  databaseURL: "https://votre-projet-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "votre-projet",
+  storageBucket: "votre-projet.firebasestorage.app",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc"
+};
 ```
 
-## 7. Activer l’authentification anonyme
+Ne laissez aucune valeur `REMPLACE_PAR_TON_...`.
 
-1. Firebase Console > menu **Build** > **Authentication**.
-2. Cliquez sur **Commencer** si nécessaire.
-3. Ouvrez l’onglet **Sign-in method** / **Méthodes de connexion**.
-4. Cliquez sur **Anonymous / Anonyme**.
-5. Activez le fournisseur.
-6. Enregistrez.
+## Créer un QCM
 
-## 8. Créer Realtime Database
+1. Ouvrez l’URL GitHub Pages.
+2. Vérifiez que le bandeau affiche **Connecté**.
+3. Cliquez sur **Mes QCM** puis **Nouveau QCM**.
+4. Renseignez le titre et la description.
+5. Indiquez une durée par défaut. Mettez `0` pour désactiver le minuteur.
+6. Pour chaque question, vous pouvez définir une durée spécifique ; `0` reprend la durée par défaut.
+7. Cochez une ou plusieurs bonnes réponses.
+8. Activez la note partielle si nécessaire.
+9. Enregistrez.
 
-1. Firebase Console > **Build** > **Realtime Database**.
-2. Cliquez sur **Créer une base de données**.
-3. Choisissez une région Europe si possible.
-4. Terminez la création.
-5. Ouvrez l’onglet **Rules / Règles**.
-6. Ouvrez le fichier local `database.rules.json`.
-7. Copiez le contenu complet et collez-le dans Firebase.
-8. Cliquez sur **Publier**.
+## Importer un QCM JSON
 
-Ne laissez pas les règles temporaires de test ouvertes.
-
-## 9. Activer GitHub Pages
-
-1. Dans GitHub, ouvrez votre dépôt `qcm-live`.
-2. Cliquez sur **Settings**.
-3. Cliquez sur **Pages** dans le menu gauche.
-4. Source : **Deploy from a branch**.
-5. Branche : `main`.
-6. Dossier : `/(root)`.
-7. Cliquez sur **Save**.
-8. Après une ou deux minutes, GitHub affiche une URL semblable à :
+Dans **Mes QCM** :
 
 ```text
-https://VOTRE-COMPTE.github.io/qcm-live/
+Importer JSON → choisir qcm-mathematiques.json
 ```
 
-Ouvrez-la. Le bandeau doit afficher **Connecté** après quelques secondes.
-
-## 10. Tester
-
-### Présentateur
-
-1. Sur PC, ouvrez l’adresse GitHub Pages.
-2. Cliquez sur **Mes QCM**.
-3. Cliquez sur **Nouveau QCM**.
-4. Ajoutez un titre, les questions, 4 réponses et cochez les bonnes réponses.
-5. Cliquez sur **Enregistrer le QCM**.
-6. Dans la bibliothèque, cliquez sur **Lancer**.
-7. Affichez le QR code aux participants.
-
-### Participant
-
-1. Avec un autre téléphone ou une fenêtre de navigation privée, scannez le QR code.
-2. Saisissez un pseudo.
-3. Répondez à chaque question.
-4. Vous ne voyez ni correction ni score intermédiaire.
-5. À la dernière question, le score global apparaît.
-
-### Présentateur — rapport
-
-1. Regardez le tableau : chaque colonne Q1, Q2, etc. affiche `1`, `0,5`, `0` ou `—`.
-2. Cliquez sur **Télécharger le rapport PDF**.
-3. Le PDF contient une fiche détaillée par participant.
-4. Les réponses sélectionnées sont encadrées ; les bonnes réponses sont en gras.
-5. Les dernières pages contiennent la synthèse et les statistiques par question.
-
-## 11. Créer une question à demi-point
-
-Pour une question avec 3 bonnes réponses parmi 4 :
-
-1. Cochez les trois bonnes réponses dans l’éditeur.
-2. Cochez **Autoriser une note partielle**.
-3. Mettez `2` dans « Bonnes réponses nécessaires ».
-4. Mettez `0,5` dans « Points partiels ».
-
-Exemple : A, C et D correctes ; B fausse.
-
-| Réponses cochées | Note |
-|---|---:|
-| A + C + D | 1 |
-| A + C | 0,5 |
-| A + D | 0,5 |
-| C + D | 0,5 |
-| A + B | 0 |
-| A + C + B | 0 |
-| Toutes les réponses | 0 |
-
-Une mauvaise réponse cochée annule la note partielle.
-
-## 12. Importer les QCM fournis
-
-Deux fichiers sont inclus :
+ou :
 
 ```text
-qcm-mathematiques.json
-qcm-qualite-agroalimentaire.json
+Importer JSON → choisir qcm-qualite-agroalimentaire.json
 ```
 
-Pour les charger :
+## Lancer une session
 
-1. Ouvrez **Mes QCM**.
-2. Cliquez sur **Importer un QCM JSON**.
-3. Sélectionnez l’un des deux fichiers.
-4. Le QCM apparaît dans la liste.
-5. Cliquez sur **Modifier** si vous voulez l’adapter.
-6. Cliquez sur **Lancer** pour créer une salle.
+1. Dans Mes QCM, cliquez sur **Lancer**.
+2. Le code et le QR code apparaissent.
+3. Les participants scannent le QR code.
+4. Chaque participant saisit son pseudo.
+5. Chaque personne répond à son rythme.
+6. Aucune correction n’est montrée.
+7. Après la dernière question, seul le résultat global apparaît.
 
-## 13. Limites gratuites à surveiller
+## Minuterie
 
-- Firebase Spark Realtime Database : environ 100 connexions simultanées pour ce type d’usage gratuit.
-- Un onglet navigateur ouvert compte généralement comme une connexion.
-- Pour rester confortable, limitez les séances à environ 70 à 80 participants connectés simultanément.
-- Nettoyez occasionnellement les anciennes salles dans Firebase Realtime Database si vous effectuez beaucoup de tests.
+Pour activer la minuterie :
 
-## 14. Dépannage
+- mettez `30` dans Durée par question pour 30 secondes ;
+- ou mettez une valeur spécifique dans chaque question.
 
-| Problème | Cause probable | Solution |
-|---|---|---|
-| `auth/operation-not-allowed` | Auth anonyme inactive | Activez Anonymous dans Authentication |
-| `permission_denied` | Règles non publiées | Collez et publiez `database.rules.json` |
-| Le bandeau reste sur Connexion | Mauvaise config Firebase | Vérifiez `firebaseConfig` et `databaseURL` |
-| QR code mène à une page absente | GitHub Pages non publié | Vérifiez Settings > Pages et attendez le déploiement |
-| Ancienne interface affichée | Cache navigateur | Rechargez avec Ctrl+F5 ou videz les données du site |
-| Deux tests partagent le même participant | Même navigateur | Utilisez un autre appareil ou une fenêtre privée |
+À moins de 5 secondes :
 
-## 15. Évolutions possibles sans changer l’usage
+- le compteur devient orange ;
+- une animation attire l’attention ;
+- le téléphone peut vibrer si le navigateur autorise `navigator.vibrate`.
 
-- Ajout d’un logo sur le PDF.
-- Ajout de nom, prénom et groupe participant.
-- Export CSV.
-- Minuteur par question.
-- Suppression des QCM et des salles depuis l’interface.
-- Duplication d’un QCM.
-- Classement final optionnel.
+À zéro :
 
-Pour une correction réellement cachée et un usage anti-triche, il faudra à l’avenir ajouter un backend sécurisé, ce qui sort de la solution strictement gratuite.
+- la réponse sélectionnée est envoyée automatiquement ;
+- si aucune réponse n’est sélectionnée, la question est enregistrée sans réponse et vaut 0.
+
+## Tableau présentateur
+
+Le tableau affiche :
+
+- participant ;
+- une colonne Q1, Q2, etc. ;
+- score question par question ;
+- score total ;
+- progression ;
+- statut.
+
+Couleurs :
+
+- vert : 1 point ;
+- orange : 0,5 point ;
+- rouge : 0 point ;
+- gris : pas encore répondu.
+
+Les filtres permettent d’afficher :
+
+```text
+Tous
+En cours
+Terminés
+```
+
+## Rapports PDF
+
+### Rapport formateur
+
+Cliquez sur :
+
+```text
+Rapport PDF formateur
+```
+
+Le PDF contient :
+
+- une fiche par participant ;
+- date, titre et pseudo ;
+- réponses sélectionnées encadrées ;
+- bonnes réponses en gras ;
+- score par question ;
+- synthèse de la session.
+
+### PDF vierge hors ligne
+
+Cliquez sur :
+
+```text
+PDF vierge hors ligne
+```
+
+Ce PDF ne demande pas de nom. Il contient une ligne vide pour écrire le nom à la main et toutes les questions avec cases à cocher. Il peut être utilisé sans réseau pour distribuer une version papier.
+
+## Sauvegarde et dépannage
+
+Les QCM sont sauvegardés dans Realtime Database. Si Firebase n’est pas joignable, la page ne pourra pas charger la bibliothèque distante ; gardez une copie JSON exportée localement.
+
+Erreurs courantes :
+
+- `permission-denied` : publiez `database.rules.json` et vérifiez Anonymous activé.
+- `auth/operation-not-allowed` : activez Authentication > Anonymous.
+- `Connexion…` permanent : vérifiez `firebaseConfig` et `databaseURL`.
+- Page ancienne : rechargez avec Ctrl+F5 et effacez les données du site.
+- PDF non généré : vérifiez que les scripts jsPDF et AutoTable sont chargés.
+
+## Limite gratuite
+
+Cette édition n’utilise pas Cloud Functions. Elle est donc gratuite avec Firebase Spark dans un usage raisonnable. Les bonnes réponses sont transmises au navigateur pour calculer les notes : l’application n’est pas anti-triche. Pour un examen officiel, il faut un backend sécurisé et probablement un plan payant.

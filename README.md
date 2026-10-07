@@ -1,8 +1,5 @@
-# QCM Live — édition gratuite
+# QCM Live gratuit V2
 
-Application web gratuite utilisant GitHub Pages et Firebase Spark (Authentication anonyme + Realtime Database).
+Priorités 1, 2, 5 et 6 : bibliothèque de QCM, import/export, sauvegarde Firebase, progression, minuterie avec alerte sous 5 secondes, tableau coloré filtrable, PDF formateur et PDF vierge hors ligne.
 
-Lire `GUIDE_INSTALLATION.md` avant l’installation.
-
-## Limite importante
-Les bonnes réponses transitent dans le navigateur afin de rester sans backend payant. L’interface ne les révèle pas, mais cette version ne convient pas à un examen certifiant ou anti-triche.
+Cette édition reste sans Cloud Functions et sans plan Blaze. Les bonnes réponses sont donc présentes dans le navigateur : adaptée à la formation et à l’autoévaluation, pas à un examen anti-triche.

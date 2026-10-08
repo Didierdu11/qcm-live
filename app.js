@@ -623,7 +623,7 @@ function updateJoin(roomCode, room) {
       const name = playerName.value.trim();
 
       if (name.length < 2) {
-        notice("Le pseudo doit contenir au moins 2 caractères.");
+        notice("Saisis ton nom et ton prénom.");
         return;
       }
 

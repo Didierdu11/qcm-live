@@ -654,15 +654,52 @@ function updateJoin(roomCode, room) {
   }
 
   if (player.completed) {
-    resultCard.classList.remove("hidden");
-    resultCard.innerHTML = `
-      <h2>QCM terminé</h2>
-      <p>
-        Ton résultat :
-        <strong>${formatScore(player.score)} sur ${room.questions.length}</strong>
+  resultCard.classList.remove("hidden");
+
+  resultCard.innerHTML = `
+    <section class="certificate">
+      <div class="certificate-ribbon">
+        QCM LIVE
+      </div>
+
+      <div class="certificate-icon">
+        ★
+      </div>
+
+      <p class="certificate-label">
+        ATTESTATION DE PARTICIPATION
       </p>
-    `;
-    return;
+
+      <h2>Félicitations !</h2>
+
+      <p>
+        Vous avez terminé le QCM :
+      </p>
+
+      <h3>
+        ${escapeHtml(room.title)}
+      </h3>
+
+      <div class="certificate-score">
+        <span>Résultat obtenu</span>
+
+        <strong>
+          ${formatScore(player.score)} / ${room.questions.length}
+        </strong>
+
+        <small>
+          bonne(s) réponse(s)
+        </small>
+      </div>
+
+      <p class="certificate-date">
+        ${new Date().toLocaleDateString("fr-FR")}
+      </p>
+    </section>
+  `;
+
+  return;
+}
   }
 
   if (room.status !== "OPEN") {

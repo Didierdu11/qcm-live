@@ -18,7 +18,7 @@ const fb=initializeApp(firebaseConfig),
   root=document.querySelector('#app'),
   toast=document.querySelector('#toast'),
   L=['A','B','C','D'];
-let user=null,stop=null,editingId=null,draft=[],seq=0,toastTimer=null;
+let user=null,stop=null,editingId=null,draft=[],seq=0,toastTimer=null,selfScoreCache=null;
 
 signInAnonymously(auth).catch(e=>notify(e.code+': '+e.message));
 onAuthStateChanged(auth,u=>{user=u;document.getElementById('connectionState').textContent=u?'Connecté':'Erreur';if(u)route()});
@@ -288,6 +288,7 @@ async function host(c){
 
 /* ===================== PARTICIPANT ===================== */
 function join(c){
+  selfScoreCache=null;
   root.innerHTML=joinTemplate.innerHTML;
   /* Le participant n'écoute que ce qui le concerne (pas les autres joueurs ni leurs réponses) */
   stop=watch([
@@ -332,11 +333,20 @@ function renderJoin(c,r){
   if(p.completed){
     questionCard.classList.add('hidden');questionCard.dataset.idx='';
     resultCard.classList.remove('hidden');
-    const graded=Object.keys(r.grades).length,score=Object.values(r.grades).reduce((a,b)=>a+(+b||0),0);
-    if(graded<n){
-      resultCard.innerHTML=`<h2>Merci ${safe(p.name)} !</h2><p>Vos réponses sont enregistrées. La correction est en cours (${graded}/${n}) : gardez cette page ouverte, le résultat s'affichera automatiquement.</p>`;
+    /* Résultat calculé localement : chaque solution n'est lisible qu'après avoir répondu à la question */
+    if(selfScoreCache?.c!==c||selfScoreCache.busy){
+      resultCard.innerHTML=`<h2>Merci ${safe(p.name)} !</h2><p>Calcul de votre résultat…</p>`;
+      if(selfScoreCache?.c!==c){
+        selfScoreCache={c,busy:true};
+        const my=seq;
+        selfScore(c,r.questions).then(s=>{
+          selfScoreCache={c,score:s};
+          if(my===seq)renderJoin(c,r)
+        }).catch(e=>{selfScoreCache=null;notify('Calcul du résultat impossible : '+e.message)})
+      }
       return
     }
+    const score=selfScoreCache.score;
     resultCard.innerHTML=`<section class="certificate"><div class="certificate-ribbon">QCM LIVE</div><div class="certificate-icon">★</div><p class="certificate-label">ATTESTATION DE PARTICIPATION</p><h2>Félicitations !</h2><p>Participant : <strong>${safe(p.name)}</strong></p><p>Vous avez terminé le QCM :</p><h3>${safe(r.title)}</h3><div class="certificate-score"><span>Résultat obtenu</span><strong>${fmt(score)} / ${n}</strong><small>bonne(s) réponse(s)</small></div></section>`;
     return
   }
@@ -370,9 +380,19 @@ function renderJoin(c,r){
       })
     }catch(e){
       btn.disabled=false;
-      notify('Réponse refusée (déjà envoyée ou session fermée).')
+      notify('Réponse refusée ('+(e.code||e.message)+') : déjà envoyée, session fermée ou règles non publiées.')
     }
   }
+}
+
+async function selfScore(c,questions){
+  const a=(await get(ref(db,`rooms/${c}/answers/${user.uid}`))).val()||{};
+  const parts=await Promise.all(questions.map(async q=>{
+    if(!a[q.id])return 0;
+    const k=(await get(ref(db,`roomKeys/${c}/${q.id}`))).val();
+    return k?mark(k,a[q.id].selectedIndexes||[]):0
+  }));
+  return parts.reduce((x,y)=>x+y,0)
 }
 
 /* ===================== EXPORTS ===================== */
